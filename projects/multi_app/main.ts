@@ -105,10 +105,21 @@ function printNumber(value: number) {
   printLeds(buildLed(value));
 }
 
-class Tally {
+class Base {
+  constructor() {}
+  init() {}
+  leave() {}
+  main() {}
+  buttonA() {}
+  buttonB() {}
+  shake() {}
+}
+
+class Tally extends Base {
   value: number = 0;
 
   constructor(initial: number = 0) {
+    super();
     this.value = initial;
   }
 
@@ -131,12 +142,13 @@ class Tally {
   }
 }
 
-class TempMeter {
+class TempMeter extends Base {
   min: number;
   max: number;
   status: number = 0;
 
   constructor() {
+    super();
     this.min = 99;
     this.max = 0;
   }
@@ -173,10 +185,11 @@ class TempMeter {
   }
 }
 
-class Clean {
-  status: number = 0;
+class Bright extends Base {
 
-  constructor() {}
+  constructor() {
+    super();
+  }
 
   init() {
     this.status = 0;
@@ -197,7 +210,7 @@ class Clean {
 }
 
 let current: number = 0;
-let apps = [new TempMeter(), new Tally(0), new Clean()];
+apps[current].init();
 
 basic.forever(function () {
   apps[current].main();
