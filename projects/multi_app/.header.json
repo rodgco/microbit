@@ -1,0 +1,17 @@
+{
+    "name": "multi_app",
+    "meta": {},
+    "editor": "tsprj",
+    "pubId": "",
+    "pubCurrent": false,
+    "target": "microbit",
+    "targetVersion": "3.1.1",
+    "cloudSync": false,
+    "id": "ede8e625-18f9-4e79-3647-ea9d487672e3",
+    "recentUse": 1591153880,
+    "modificationTime": 1591153880,
+    "path": "multi_app",
+    "blobCurrent": false,
+    "saveId": null,
+    "githubCurrent": false
+}
