@@ -123,8 +123,6 @@ class Tally extends Base {
     this.value = initial;
   }
 
-  init() {}
-
   main() {
     printNumber(this.value);
   }
@@ -152,8 +150,6 @@ class TempMeter extends Base {
     this.min = 99;
     this.max = 0;
   }
-
-  init() {}
 
   main() {
     let current = input.temperature();
@@ -186,30 +182,52 @@ class TempMeter extends Base {
 }
 
 class Bright extends Base {
+  savedBright: number;
+  bright: number = 0;
 
   constructor() {
     super();
+    this.savedBright = led.brightness();
   }
 
   init() {
-    this.status = 0;
+    this.bright = 0;
+    led.setBrightness(this.bright);
+    led.plotAll();
+  }
+
+  leave() {
+    led.setBrightness(this.savedBright);
   }
 
   main() {
-    if (this.status === 0) {
-      basic.clearScreen();
-      this.status = 1;
-    }
+    led.setBrightness(this.bright);
   }
 
   buttonA() {
-    led.toggleAll();
+    if (this.bright > 10) {
+      this.bright -= 10;
+    } else {
+      this.bright = 0;
+    }
   }
 
-  buttonB() {}
+  buttonB() {
+    if (this.bright < 245) {
+      this.bright += 10;
+    } else {
+      this.bright = 255;
+    }
+  }
+
+  shake() {
+    this.buttonB();
+  }
 }
 
 let current: number = 0;
+let apps = [new Bright(), new TempMeter(), new Tally(0)];
+
 apps[current].init();
 
 basic.forever(function () {
@@ -217,6 +235,7 @@ basic.forever(function () {
 });
 
 input.onButtonPressed(Button.AB, () => {
+  apps[current].leave();
   current++;
   if (current === apps.length) {
     current = 0;
@@ -230,4 +249,8 @@ input.onButtonPressed(Button.A, () => {
 
 input.onButtonPressed(Button.B, () => {
   apps[current].buttonB();
+});
+
+input.onShake(() => {
+  apps[current].shake();
 });
