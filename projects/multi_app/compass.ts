@@ -26,9 +26,9 @@ namespace tools {
           led.plot(2, 3);
         }
       } else {
-        if (compass <= 22) {
+        if (compass <= 22 || compass > 337) {
           arrow = 0;
-        } else if (compass <= 67 || compass > 337) {
+        } else if (compass <= 67) {
           arrow = 7;
         } else if (compass <= 112) {
           arrow = 6;
