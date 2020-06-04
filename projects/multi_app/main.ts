@@ -1,110 +1,3 @@
-const NUMBERS = [
-  [
-    [1, 1],
-    [1, 1],
-    [1, 1],
-    [1, 1],
-    [1, 1],
-  ],
-  [
-    [0, 1],
-    [0, 1],
-    [0, 1],
-    [0, 1],
-    [0, 1],
-  ],
-  [
-    [1, 1],
-    [0, 1],
-    [1, 1],
-    [1, 0],
-    [1, 1],
-  ],
-  [
-    [1, 1],
-    [0, 1],
-    [1, 1],
-    [0, 1],
-    [1, 1],
-  ],
-  [
-    [1, 1],
-    [1, 1],
-    [1, 1],
-    [0, 1],
-    [0, 1],
-  ],
-  [
-    [1, 1],
-    [1, 0],
-    [1, 1],
-    [0, 1],
-    [1, 1],
-  ],
-  [
-    [1, 0],
-    [1, 0],
-    [1, 1],
-    [1, 1],
-    [1, 1],
-  ],
-  [
-    [1, 1],
-    [0, 1],
-    [0, 1],
-    [0, 1],
-    [0, 1],
-  ],
-  [
-    [1, 1],
-    [1, 1],
-    [0, 0],
-    [1, 1],
-    [1, 1],
-  ],
-  [
-    [1, 1],
-    [1, 1],
-    [1, 1],
-    [0, 1],
-    [1, 1],
-  ],
-];
-
-function buildLed(value: number) {
-  let response: number[][] = [];
-
-  const dezena = Math.trunc(value / 10) % 10;
-  const unidade = value % 10;
-
-  for (let c = 0; c <= 4; c++) {
-    response[c] = [
-      NUMBERS[dezena][c][0],
-      NUMBERS[dezena][c][1],
-      0,
-      NUMBERS[unidade][c][0],
-      NUMBERS[unidade][c][1],
-    ];
-  }
-  return response;
-}
-
-function printLeds(panel: number[][]): void {
-  panel.forEach((line, y) => {
-    line.forEach((cell, x) => {
-      if (cell === 1) {
-        led.plot(x, y);
-      } else {
-        led.unplot(x, y);
-      }
-    });
-  });
-}
-
-function printNumber(value: number) {
-  printLeds(buildLed(value));
-}
-
 class Base {
   constructor() {}
   init() {}
@@ -117,14 +10,22 @@ class Base {
 
 class Tally extends Base {
   value: number = 0;
+  old_value: number = -1;
 
   constructor(initial: number = 0) {
     super();
     this.value = initial;
   }
 
+  init() {
+    tools.printNumber(this.value);
+  }
+
   main() {
-    printNumber(this.value);
+    if (this.value !== this.old_value) {
+      tools.printNumber(this.value);
+    }
+    this.old_value = this.value;
   }
 
   buttonA() {
@@ -144,6 +45,7 @@ class TempMeter extends Base {
   min: number;
   max: number;
   status: number = 0;
+  last_temp: number = 9999;
 
   constructor() {
     super();
@@ -151,33 +53,34 @@ class TempMeter extends Base {
     this.max = 0;
   }
 
+  init() {
+    tools.printNumber(input.temperature());
+  }
+
   main() {
     let current = input.temperature();
+
+    if (this.last_temp === current) {
+      return;
+    }
+
+    this.last_temp = current;
     this.max = Math.max(current, this.max);
     this.min = Math.min(current, this.min);
-    switch (this.status) {
-      case -1:
-        printNumber(this.min);
-        pause(2000);
-        this.status = 0;
-        break;
-      case 0:
-        printNumber(current);
-        break;
-      case 1:
-        printNumber(this.max);
-        pause(2000);
-        this.status = 0;
-        break;
-    }
+
+    tools.printNumber(current);
   }
 
   buttonA() {
-    this.status = -1;
+    tools.printNumber(this.min);
+    pause(2000);
+    tools.printNumber(input.temperature());
   }
 
   buttonB() {
-    this.status = 1;
+    tools.printNumber(this.max);
+    pause(2000);
+    tools.printNumber(input.temperature());
   }
 }
 
@@ -225,8 +128,32 @@ class Bright extends Base {
   }
 }
 
+class Random extends Base {
+  constructor() {
+    super();
+  }
+
+  init() {
+    basic.showString("Shake!");
+  }
+
+  shake() {
+    tools.printNumber(Math.random() * 99 + 1);
+  }
+
+  buttonA() {
+    basic.clearScreen();
+  }
+}
+
 let current: number = 0;
-let apps = [new Bright(), new TempMeter(), new Tally(0)];
+let apps: Base[] = [
+  new tools.Compass(),
+  new Bright(),
+  new TempMeter(),
+  new Tally(0),
+  new Random(),
+];
 
 apps[current].init();
 
@@ -236,6 +163,7 @@ basic.forever(function () {
 
 input.onButtonPressed(Button.AB, () => {
   apps[current].leave();
+  basic.clearScreen();
   current++;
   if (current === apps.length) {
     current = 0;

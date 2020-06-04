@@ -1,13 +1,10 @@
 {
-    "name": "multi_app",
-    "description": "",
-    "dependencies": {
-        "core": "*",
-        "radio": "*"
-    },
-    "files": [
-        "main.ts",
-        "README.md"
-    ],
-    "preferredEditor": "tsprj"
+  "name": "multi_app",
+  "description": "",
+  "dependencies": {
+    "core": "*",
+    "radio": "*"
+  },
+  "files": ["main.ts", "tools.ts", "compass.ts", "README.md"],
+  "preferredEditor": "tsprj"
 }
