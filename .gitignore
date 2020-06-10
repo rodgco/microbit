@@ -1,2 +1,4 @@
 node_modules
 built
+projects/multi_app/built/binary.asm
+projects/multi_app/built/binary.hex
